@@ -1,6 +1,6 @@
 {
   "name": "@davidcrammer/shotgun",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A tool for consolidating the strengths of Zustand and SWR to streamline data fetching and formatting ",
   "main": "src/index.js",
   "scripts": {
@@ -14,5 +14,8 @@
     "swr": "^2.2.1",
     "zustand": "^4.4.1"
   },
-  "respository": "https://github.com/davidcrammer/shotgun.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davidcrammer/shotgun.git"
+  }
 }
