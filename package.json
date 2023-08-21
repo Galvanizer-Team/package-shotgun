@@ -1,6 +1,6 @@
 {
   "name": "@davidcrammer/shotgun",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "A tool for consolidating the strengths of Zustand and SWR to streamline data fetching and formatting ",
   "main": "src/index.js",
   "scripts": {
