@@ -12,13 +12,11 @@ async function fetcher(url) {
   return res.json()
 }
 
-function useStore() {
-  return create((set) => ({
-    data: {},
-    setData: (store, data) =>
-      set((state) => ({ data: { ...state.data, [store]: data } })),
-  }))
-}
+const useStore = create((set) => ({
+  data: {},
+  setData: (store, data) =>
+    set((state) => ({ data: { ...state.data, [store]: data } })),
+}))
 
 function formatDataObject(data, formatting) {
   if (!data) return {}
