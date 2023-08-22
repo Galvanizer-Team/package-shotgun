@@ -13,7 +13,7 @@ async function fetcher(url) {
 }
 
 function useStore() {
-  create((set) => ({
+  return create((set) => ({
     data: {},
     setData: (store, data) =>
       set((state) => ({ data: { ...state.data, [store]: data } })),
