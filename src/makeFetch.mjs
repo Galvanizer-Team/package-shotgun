@@ -54,7 +54,7 @@ export default async function makeFetch(
         Error: "Failed to fetch data",
         error_message: error.message,
         data: data,
-        url: url,
+        url: route,
       }
       return res
     })
