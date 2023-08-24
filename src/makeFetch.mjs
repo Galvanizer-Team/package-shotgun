@@ -6,6 +6,7 @@ export default async function makeFetch(
   data = {}
 ) {
   const formData = new FormData()
+  let key = ""
 
   //read query args, structure as ?arg1=val1&arg2=val2 etc and append to key
   if (Object.keys(queryArgs).length > 0) {
@@ -17,6 +18,8 @@ export default async function makeFetch(
     query = query.slice(0, -1)
     key += query
   }
+
+  route += key
 
   //map data json object to form data
   Object.keys(data).forEach((key) => {
@@ -46,6 +49,7 @@ export default async function makeFetch(
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }
+
       return response.json()
     })
     .catch((error) => {
