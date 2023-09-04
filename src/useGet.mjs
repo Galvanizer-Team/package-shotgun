@@ -1,7 +1,6 @@
 import useSWR from "swr"
 import { useEffect } from "react"
 import { create } from "zustand"
-import { mutate } from "swr"
 
 async function fetcher(url) {
   const res = await fetch(url)
@@ -12,12 +11,6 @@ async function fetcher(url) {
   }
   return res.json()
 }
-
-const useStore = create((set) => ({
-  data: {},
-  setData: (store, data) =>
-    set((state) => ({ data: { ...state.data, [store]: data } })),
-}))
 
 function formatDataObject(data, formatting) {
   if (!data) return {}
@@ -45,40 +38,39 @@ function formatDataObject(data, formatting) {
   return formattedData
 }
 
-export default function useGet(store, url, formatting) {
-  const dataStore = useStore((state) => state?.data)
-  const setDataStore = useStore((state) => state?.setData)
-  const { data, error } = useSWR(url && url !== "unset" ? store : null, () =>
-    fetcher(url && url !== "unset" ? url : null)
+export default function useGet(useStore, url, formatting) {
+  const { data: dataStore, setData: setDataStore, name: storeName } = useStore()
+
+  const { data, error } = useSWR(url ? storeName : null, () =>
+    fetcher(url ? url : null)
   )
 
   useEffect(() => {
-    if (url) console.log(url)
-    if (dataStore?.[store]) console.log(dataStore?.[store])
     if (!url) return
-    if (url === "unset") {
-      setDataStore(store, { loading: 1, fetchUrl: url })
+
+    if (error) {
+      setDataStore({ error: error, fetchUrl: url })
+      return
+    }
+    if (!data) {
+      setDataStore({ loading: 1, fetchUrl: url })
+      return
+    }
+    if (dataStore?.fetchUrl && url && dataStore?.fetchUrl !== url) {
+      setDataStore({ loading: 1, fetchUrl: url })
       return
     }
 
-    if (error) return setDataStore(store, { error: error, fetchUrl: url })
-    if (!data) return setDataStore(store, { loading: 1, fetchUrl: url })
-    if (
-      dataStore?.[store]?.fetchUrl &&
-      url &&
-      dataStore?.[store]?.fetchUrl !== url
-    ) {
-      setDataStore(store, { loading: 1, fetchUrl: url })
-      return
-    }
-    const __data = formatDataObject(data, formatting)
-    __data.fetchUrl = url
-    setDataStore(store, __data)
+    const formattedData = formatDataObject(data, formatting)
+    formattedData.fetchUrl = url
+    setDataStore(formattedData)
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, data, error, setDataStore, store])
+  }, [url, data, error, setDataStore])
 
-  if (!dataStore?.[store]) {
-    return { loading: 2 }
+  if (!dataStore) {
+    return { loading: 3 }
   }
-  return dataStore[store]
+
+  return dataStore
 }
