@@ -5,6 +5,7 @@ export default function useTrigger(
   endpoint,
   method,
   store,
+  updateData, // data to update the store with after the trigger is successful
   onSuccess = (data) => console.log(data),
   onError = (error) => console.log(error)
 ) {
@@ -34,7 +35,11 @@ export default function useTrigger(
       if (data.success === "success") {
         onSuccess(data)
         if (store) {
-          mutate(store)
+          if (!updateData) {
+            mutate(store)
+          } else {
+            mutate(store, updateData)
+          }
         }
       } else {
         onError(data)
@@ -49,5 +54,5 @@ export default function useTrigger(
     },
   })
 
-  return { trigger }
+  return trigger
 }

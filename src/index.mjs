@@ -3,5 +3,15 @@ import verify from "./verify.mjs"
 import useGet from "./useGet.mjs"
 import useTrigger from "./useTrigger.mjs"
 import makeFetch from "./makeFetch.mjs"
+import createGetStore from "./createGetStore.mjs"
+import formatDataObject from "./formatDataObject.mjs"
 
-export { format, verify, useGet, useTrigger, makeFetch }
+export {
+  format,
+  formatDataObject,
+  verify,
+  useGet,
+  useTrigger,
+  makeFetch,
+  createGetStore,
+}
