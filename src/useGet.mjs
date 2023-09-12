@@ -1,74 +1,43 @@
-import useSWR from "swr"
-import { useEffect } from "react"
-import { create } from "zustand"
-import { mutate } from "swr"
-import formatDataObject from "./formatDataObject.mjs"
+import useSWR, { useSWRConfig } from "swr"
+import { useRouter } from "next/router"
 
-async function fetcher(url) {
+const fetcher = async (url) => {
+  if (!url) return false
   const res = await fetch(url)
-  if (!res.ok) {
-    const error = new Error("An error occurred while fetching the data.")
-    error.statusCode = res.status
-    throw error
-  }
-  return res.json()
+  return await res.json()
 }
 
-export default function useGet(
-  useStore,
-  url = "unset",
-  formatting,
-  urlExtention = ""
-) {
-  const dataStore = useStore((state) => state.data)
-  const setDataStore = useStore((state) => state.setData)
-  const fetchUrl = useStore((state) => state.url)
-  const setFetchUrl = useStore((state) => state.setUrl)
-  const storeName = useStore((state) => state.name)
+export default function useGet(store, urlSpecific, options = {}) {
+  const router = useRouter()
+  const { url, proxyUrl = "/api/proxy" } = options
 
-  const { data, error } = useSWR(
-    url && url !== "unset" ? storeName : null,
-    () => fetcher(url && url !== "unset" ? url + urlExtention : null)
+  if (urlSpecific) {
+    if (router.isReady) {
+      store = store + router.asPath
+    } else {
+      store = null
+    }
+  }
+
+  const endpoint = `${proxyUrl}?url=${encodeURIComponent(url)}&store=${store}`
+  const { data, error } = useSWR(url && store ? store : "", () =>
+    fetcher(endpoint)
   )
+  const { cache } = useSWRConfig()
 
-  const updateFetchUrl = (url) => {
-    if (url === fetchUrl) return
-    setFetchUrl(url)
+  if (!url) {
+    const cachedData = cache.get(store)
+    if (cachedData && Object.keys(cachedData).length > 0) {
+      return {
+        data: cachedData.data,
+        error: cachedData.error,
+      }
+    }
+    return {}
   }
 
-  useEffect(() => {
-    if (url === "unset") return
-
-    if (!url) {
-      setDataStore({ loading: 1 })
-      return
-    }
-    if (error) {
-      updateFetchUrl(url)
-      setDataStore({ error: error })
-      return
-    }
-    if (!data) {
-      updateFetchUrl(url)
-      setDataStore({ loading: 2 })
-      return
-    }
-    if (fetchUrl && url && fetchUrl !== url) {
-      updateFetchUrl(url)
-      mutate(storeName, null)
-      setDataStore({ loading: 3 })
-      return
-    }
-
-    updateFetchUrl(url)
-    setDataStore(formatDataObject(data, formatting))
-  }, [url, data, fetchUrl, error, setDataStore])
-
-  if (!dataStore) {
-    return { loading: 4 }
+  return {
+    data,
+    error,
   }
-
-  if (!url) return { loading: 5 }
-
-  return dataStore
 }
