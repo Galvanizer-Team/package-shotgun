@@ -1,14 +1,5 @@
 export default async function makeFetch(route, method = "GET", options) {
-  let { queryArgs = {}, data = {}, headers, contentType = "formdata" } = options
-
-  //read query args, structure as ?arg1=val1&arg2=val2...
-  if (Object.keys(queryArgs).length > 0) {
-    let query = "?"
-    Object.keys(queryArgs).forEach((key) => {
-      query += `${key}=${encodeURIComponent(queryArgs[key])}&`
-    })
-    route += query.slice(0, -1)
-  }
+  let { data = {}, headers, contentType = "formdata" } = options
 
   //map data json object to form data
   let body = null
@@ -25,15 +16,15 @@ export default async function makeFetch(route, method = "GET", options) {
       break
   }
 
-  const options = {
+  const fetchOptions = {
     method: method,
     cache: "no-cache",
     body,
     headers,
   }
-  if (method === "GET") delete options.body
+  if (method === "GET") delete fetchOptions.body
 
-  const res = fetch(route, options)
+  const res = fetch(route, fetchOptions)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok")

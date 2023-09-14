@@ -1,7 +1,8 @@
+import React from "react"
 import useSWRMutation from "swr/mutation"
 import { mutate } from "swr"
 import { useState } from "react"
-import { useRouter } from "next/router"
+import { useRouter } from "next/router.js"
 
 function defaultButtonAction(trigger, setIsLoading, extendClick = () => null) {
   setIsLoading(true)
@@ -82,7 +83,9 @@ export default function useTrigger(endpoint, method, options = {}) {
     if (buttonSavingText !== null && isLoading) {
       extendedProps.children = buttonSavingText
     }
-    const ButtonComponent = (props) => <Button {...props} {...extendedProps} />
+    function ButtonComponent(props) {
+      return React.createElement(Button, { ...props, ...extendedProps })
+    }
     return { trigger, Button: ButtonComponent }
   }
   return trigger

@@ -1,5 +1,5 @@
 import useSWR, { useSWRConfig } from "swr"
-import { useRouter } from "next/router"
+import { useRouter } from "next/router.js"
 
 const fetcher = async (url) => {
   if (!url) return false
