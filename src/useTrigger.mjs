@@ -4,9 +4,15 @@ import { mutate } from "swr"
 import { useState } from "react"
 import { useRouter } from "next/router.js"
 
-function defaultButtonAction(trigger, setIsLoading, extendClick = () => null) {
+function defaultButtonAction(
+  trigger,
+  triggerOnClick,
+  setIsLoading,
+  extendClick = () => null,
+  triggerBody
+) {
+  if (triggerOnClick) trigger(triggerBody)
   setIsLoading(true)
-  trigger()
   extendClick()
 }
 
@@ -18,16 +24,35 @@ export default function useTrigger(endpoint, method, options = {}) {
     onError = () => null,
     Button,
     extendClick = () => null,
-    buttonAction = (trigger, setIsLoading, extendClick) =>
-      defaultButtonAction(trigger, setIsLoading, extendClick),
+    triggerOnClick = true,
+    buttonAction = (
+      trigger,
+      triggerOnClick,
+      setIsLoading,
+      extendClick,
+      triggerBody
+    ) =>
+      defaultButtonAction(
+        trigger,
+        triggerOnClick,
+        setIsLoading,
+        extendClick,
+        triggerBody
+      ),
     checkSuccess = (data) => data.success === "success",
     buttonSavingText,
+    proxy = true,
+    returnStore,
+    triggerBody,
   } = options
 
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
+  let _returnStore = returnStore ? "&store=" + returnStore : ""
   async function fetcher(url, { arg }) {
+    if (proxy) url = "/api/proxy?url=" + encodeURIComponent(url) + _returnStore
+
     try {
       const req = await fetch(
         url,
@@ -78,7 +103,14 @@ export default function useTrigger(endpoint, method, options = {}) {
   if (Button) {
     const extendedProps = {
       isLoading: isLoading,
-      onClick: () => buttonAction(trigger, setIsLoading, extendClick),
+      onClick: () =>
+        buttonAction(
+          trigger,
+          triggerOnClick,
+          setIsLoading,
+          extendClick,
+          triggerBody
+        ),
     }
     if (buttonSavingText !== null && isLoading) {
       extendedProps.children = buttonSavingText
@@ -86,7 +118,11 @@ export default function useTrigger(endpoint, method, options = {}) {
     function ButtonComponent(props) {
       return React.createElement(Button, { ...props, ...extendedProps })
     }
-    return { trigger, Button: ButtonComponent }
+    const extendedTrigger = (data) => {
+      trigger(data)
+      setIsLoading(true)
+    }
+    return { trigger: extendedTrigger, Button: ButtonComponent }
   }
   return trigger
 }

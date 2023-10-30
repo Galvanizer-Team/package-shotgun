@@ -1,5 +1,5 @@
 export default async function makeFetch(route, method = "GET", options) {
-  let { data = {}, headers, contentType = "formdata" } = options
+  let { data = {}, headers, contentType = "formdata", debug = false } = options
 
   //map data json object to form data
   let body = null
@@ -23,6 +23,16 @@ export default async function makeFetch(route, method = "GET", options) {
     headers,
   }
   if (method === "GET") delete fetchOptions.body
+
+  if (debug) {
+    console.log("route", route)
+    console.log("method", method)
+    console.log("data", data)
+    console.log("headers", headers)
+    console.log("contentType", contentType)
+    console.log("body", body)
+    console.log("fetchOptions", fetchOptions)
+  }
 
   const res = fetch(route, fetchOptions)
     .then((response) => {
