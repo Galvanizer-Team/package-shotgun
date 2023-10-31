@@ -11,15 +11,11 @@ const fetcher = async (url) => {
 
 export default function useGet(store, urlSpecific, options = {}) {
   const router = useRouter()
-  const { url, proxyUrl = "/api/proxy" } = options
+  const { url, proxyUrl = "/api/proxy", id = "" } = options
 
-  if (urlSpecific) {
-    if (router.isReady) {
-      store = store + router.asPath
-    } else {
-      store = null
-    }
-  }
+  if (urlSpecific) store = store + router.asPath
+  if (id) store += "/" + id
+  if (!router.isReady) store = null
 
   const endpoint = `${proxyUrl}?url=${encodeURIComponent(url)}&store=${store}`
   const { data, error } = useSWR(url && store ? store : "", () =>
@@ -31,7 +27,11 @@ export default function useGet(store, urlSpecific, options = {}) {
   useEffect(() => {
     if (url) {
       if (shouldMutate) {
-        mutate(store, data, true)
+        mutate(
+          (key) => typeof key === "string" && key.startsWith(store),
+          data,
+          true
+        )
       } else {
         setShouldMutate(true)
       }

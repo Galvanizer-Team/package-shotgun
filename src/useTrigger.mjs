@@ -83,11 +83,12 @@ export default function useTrigger(endpoint, method, options = {}) {
       onSuccess(data)
       if (store) {
         if (!updateData) {
-          mutate(store)
-          mutate(store + router.asPath)
+          mutate((key) => typeof key === "string" && key.startsWith(store))
         } else {
-          mutate(store, updateData)
-          mutate(store + router.asPath, updateData)
+          mutate(
+            (key) => typeof key === "string" && key.startsWith(store),
+            updateData
+          )
         }
       }
     } else {
