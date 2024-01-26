@@ -1,6 +1,6 @@
 {
   "name": "@davidcrammer/shotgun",
-  "version": "5.1.0",
+  "version": "5.1.2",
   "description": "A tool for streamlining data fetching and formatting in Next.js applications.",
   "main": "src/index.mjs",
   "scripts": {},
@@ -11,7 +11,7 @@
     "url": "https://github.com/davidcrammer/shotgun.git"
   },
   "type": "module",
-  "types": "davidcrammer__shotgun.d.ts",
+  "types": "index.d.ts",
   "dependencies": {
     "swr": "^2.2.1",
     "next": "^13.4.8",

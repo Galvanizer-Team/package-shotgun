@@ -11,15 +11,33 @@ const fetcher = async (url) => {
 
 export default function useGet(store, urlSpecific, options = {}) {
   const router = useRouter()
-  const { url, proxyUrl = "/api/proxy", id = "" } = options
+  let {
+    url,
+    proxyUrl = "/api/proxy",
+    id = "",
+    swrOptions = {},
+    ignoreSubdomain,
+    debug,
+  } = options
 
+  if (ignoreSubdomain) {
+    // get current url and remove subdomain
+    const currentUrl = window.location.href
+    const urlObject = new URL(currentUrl)
+    const baseUrl = urlObject.protocol + "//" + urlObject.host
+    proxyUrl = baseUrl + proxyUrl
+  }
+
+  if (debug) console.info("proxyUrl", proxyUrl)
   if (urlSpecific) store = store + router.asPath
   if (id) store += "/" + id
   if (!router.isReady) store = null
 
   const endpoint = `${proxyUrl}?url=${encodeURIComponent(url)}&store=${store}`
-  const { data, error } = useSWR(url && store ? store : "", () =>
-    fetcher(endpoint)
+  const { data, error } = useSWR(
+    url && store ? store : "",
+    () => fetcher(endpoint),
+    swrOptions
   )
   const { cache } = useSWRConfig()
 
