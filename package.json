@@ -1,6 +1,6 @@
 {
   "name": "@davidcrammer/shotgun",
-  "version": "5.1.2",
+  "version": "5.2.1",
   "description": "A tool for streamlining data fetching and formatting in Next.js applications.",
   "main": "src/index.mjs",
   "scripts": {},
