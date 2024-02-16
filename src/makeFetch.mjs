@@ -39,6 +39,11 @@ export default async function makeFetch(route, method = "GET", options) {
     if (!response.ok) {
       throw new Error("Network response was not ok")
     }
+    if (debug) {
+      console.log("|||||||||||!!")
+      console.log(response)
+      console.log("|||||||||||!!")
+    }
     return response.json()
   } catch (error) {
     if (debug) console.error("error", error, response)
