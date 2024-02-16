@@ -34,24 +34,20 @@ export default async function makeFetch(route, method = "GET", options) {
     console.log("fetchOptions", fetchOptions)
   }
 
-  const res = fetch(route, fetchOptions)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok")
-      }
-      return response.json()
-    })
-    .catch((error) => {
-      // Handle the error and get the error message
-      const res = {
-        Error: "Failed to fetch data",
-        error_message: error.message,
-        data: data,
-        url: route,
-      }
-      return res
-    })
-  res.payload = data
-  res.url = route
-  return res
+  const response = await fetch(route, fetchOptions)
+  try {
+    if (!response.ok) {
+      throw new Error("Network response was not ok")
+    }
+    return response.json()
+  } catch (error) {
+    if (debug) console.error("error", error, response)
+    const res = {
+      Error: "Failed to fetch data",
+      error_message: error.message,
+      data: data,
+      url: route,
+    }
+    return res
+  }
 }
